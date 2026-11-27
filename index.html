@@ -104,6 +104,11 @@ a{color:inherit}
 .hw b{flex:1 1 160px;font-weight:700}
 .hw small{flex:1 1 100%;color:var(--muted);font-size:13px;order:3}
 
+.postit{position:relative;background:#f6e27a;color:#3a3413;font-family:var(--thai-serif);font-weight:700;font-size:17px;line-height:1.4;
+  padding:16px 16px 14px;margin:16px 4px 2px;border-radius:3px 3px 14px 3px;transform:rotate(-1.6deg);box-shadow:0 8px 16px -10px rgba(40,40,10,.5);max-width:260px}
+.postit::before{content:"";position:absolute;top:-9px;left:50%;width:64px;height:18px;margin-left:-32px;transform:rotate(3deg);opacity:.9;
+  background:repeating-conic-gradient(var(--tape) 0 25%,var(--cream) 0 50%) 0 0/10px 10px}
+.wk.c2 .postit,.now .postit{transform:rotate(1.4deg)}
 /* footer */
 footer{margin:56px 0 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;background:var(--dark);color:var(--cream);border-radius:28px;padding:22px}
 footer img{width:96px;height:96px;object-fit:cover;object-position:30% 32%;border-radius:50%}
@@ -178,11 +183,14 @@ footer p{margin:4px 0 0;font-size:14px;color:#d7d6bf}
 // ---- ตั้งค่าโดยอาจารย์ (วันเริ่มสัปดาห์ที่ 1 ยังเป็นค่าสมมติ แก้ที่ START) ----
 var START=new Date(2026,10,16); // สัปดาห์ที่ 1 เริ่ม 16 พ.ย. 2569
 var HW={}; // ตัวอย่าง: {4:{name:"Quiz 1 (บทที่ 2)",note:"",url:"https://forms..."}}
+// โน้ตแปะ (post-it) ของแต่ละสัปดาห์
+var NOTE={3:"สอนรวมกับสัปดาห์ที่ 2 แล้ว",5:"สอนรวมกับสัปดาห์ที่ 4 แล้ว",7:"หยุดปีใหม่"};
+var OFF={7:1}; // สัปดาห์ที่หยุดเรียน
 var W=[
 [1,"บทที่ 1 บทนำสู่การสื่อสารนวัตกรรมเพื่อการเกษตร",[]],
 [2,"บทที่ 1 บทนำสู่การสื่อสารนวัตกรรมเพื่อการเกษตร (ต่อ)",[["สไลด์ 1–2.1 Communication for Agricultural Innovation","https://drive.google.com/file/d/1r4z8PYwCMU4xwGJ6ab6iHMPcLQHT6tPJ/view","9.3 MB"]]],
-[3,"บทที่ 2 หลักการถ่ายทอดองค์ความรู้ เทคโนโลยีและนวัตกรรม",[["สไลด์ 2.2–3 Communication for Agricultural Innovation (31 หน้า)","https://drive.google.com/file/d/1TxloSeeeNE2AUAlnRiy8WfYk177cO01c/view","9.3 MB"],["เกม Agri Story Studio","https://inc-pakwanclass.github.io/agri-game/","เล่นบนเว็บได้เลย","game"]]],
-[4,"บทที่ 2 (ต่อ) การออกแบบการเล่าเรื่อง (Storytelling)",[]],
+[3,"บทที่ 2 หลักการถ่ายทอดองค์ความรู้ เทคโนโลยีและนวัตกรรม",[]],
+[4,"บทที่ 2 (ต่อ) การออกแบบการเล่าเรื่อง (Storytelling)",[["สไลด์ 2.2–3 Communication for Agricultural Innovation (31 หน้า)","https://drive.google.com/file/d/1TxloSeeeNE2AUAlnRiy8WfYk177cO01c/view","9.3 MB"],["เกม Agri Story Studio","https://inc-pakwanclass.github.io/agri-game/","เล่นบนเว็บได้เลย","game"]]],
 [5,"บทที่ 3 การสร้างสื่อสร้างสรรค์ผ่านสื่อดิจิทัลในภาคการเกษตร",[]],
 [6,"บทที่ 3 (ต่อ) การสร้างแบรนด์เพื่อเกษตรและชุมชน (1) และจริยธรรมสื่อกับการคุ้มครองทรัพย์สินทางปัญญา",[]],
 [7,"บทที่ 4 การสร้างแบรนด์เพื่อเกษตรและชุมชน (2)",[]],
@@ -215,7 +223,8 @@ function dlBtn(f){if(ext(f))return document.createDocumentFragment();var a=el("a
 function hwBox(n){var h=HW[n];if(!h)return null;var c=el("div","hw");c.appendChild(el("b",null,h.name));
  if(h.note)c.appendChild(el("small",null,h.note));
  if(cur<n)c.appendChild(el("span","flag","เปิดส่ง สัปดาห์ที่ "+n));else c.appendChild(link("pill","ไปที่แบบฟอร์ม",h.url));return c}
-function filesBox(w){if(!w[2].length)return el("p","empty",w[3]==="exam"?"ไม่มีเอกสารประกอบ":"ยังไม่มีไฟล์ของสัปดาห์นี้");
+function postit(n){return NOTE[n]?el("div","postit",NOTE[n]):null}
+function filesBox(w){if(!w[2].length&&NOTE[w[0]])return postit(w[0]);if(!w[2].length)return el("p","empty",w[3]==="exam"?"ไม่มีเอกสารประกอบ":"ยังไม่มีไฟล์ของสัปดาห์นี้");
  var box=el("div","files");
  w[2].forEach(function(f){var r=el("div","f");r.appendChild(el("span","pdf",kind(f)==="game"?"เกม":"PDF"));
   var n=el("span","fn",f[0]);if(f[2])n.appendChild(el("small",null,f[2]));r.appendChild(n);
@@ -229,6 +238,7 @@ var acts=el("div","acts");
 cw[2].forEach(function(f){acts.appendChild(link("pill",openTxt(f)+": "+f[0],f[1]));acts.appendChild(dlBtn(f))});
 var hb=hwBox(cur);
 if(acts.childNodes.length)nc.appendChild(acts);
+else if(NOTE[cur])nc.appendChild(postit(cur));
 else nc.appendChild(el("p","note",cw[3]==="exam"?"สัปดาห์สอบ ไม่มีเอกสารประกอบ":"ไฟล์ของสัปดาห์นี้ยังไม่เผยแพร่"));
 if(hb)nc.appendChild(hb);
 
@@ -239,7 +249,7 @@ W.forEach(function(w,i){var li=el("li","wk "+(w[3]==="exam"?"exam":pal[i%3])+(w[
  if(i%4===1)li.appendChild(el("span","tape","")).setAttribute("aria-hidden","true");
  var top=el("div","wk-top");top.appendChild(el("div","num",String(w[0])));
  var tt=el("div","t");tt.appendChild(el("h3",null,w[1]));tt.appendChild(el("span","date","สัปดาห์ที่ "+w[0]+" · "+rng(w[0])));top.appendChild(tt);
- if(w[0]===cur)top.appendChild(el("span","flag","สัปดาห์นี้"));else if(w[3]==="exam")top.appendChild(el("span","flag","สอบ"));
+ if(w[0]===cur)top.appendChild(el("span","flag","สัปดาห์นี้"));else if(w[3]==="exam")top.appendChild(el("span","flag","สอบ"));else if(OFF[w[0]])top.appendChild(el("span","flag","หยุด"));
  li.appendChild(top);li.appendChild(filesBox(w));var h=hwBox(w[0]);if(h)li.appendChild(h);g.appendChild(li)});
 })();
 </script>
