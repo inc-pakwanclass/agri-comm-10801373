@@ -181,7 +181,7 @@ var HW={}; // ตัวอย่าง: {4:{name:"Quiz 1 (บทที่ 2)",no
 var W=[
 [1,"บทที่ 1 บทนำสู่การสื่อสารนวัตกรรมเพื่อการเกษตร",[]],
 [2,"บทที่ 1 บทนำสู่การสื่อสารนวัตกรรมเพื่อการเกษตร (ต่อ)",[["สไลด์ 1–2.1 Communication for Agricultural Innovation","https://drive.google.com/file/d/1r4z8PYwCMU4xwGJ6ab6iHMPcLQHT6tPJ/view","9.3 MB"]]],
-[3,"บทที่ 2 หลักการถ่ายทอดองค์ความรู้ เทคโนโลยีและนวัตกรรม",[]],
+[3,"บทที่ 2 หลักการถ่ายทอดองค์ความรู้ เทคโนโลยีและนวัตกรรม",[["เกม Agri Story Studio","https://inc-pakwanclass.github.io/agri-game/","เล่นบนเว็บได้เลย","game"]]],
 [4,"บทที่ 2 (ต่อ) การออกแบบการเล่าเรื่อง (Storytelling)",[]],
 [5,"บทที่ 3 การสร้างสื่อสร้างสรรค์ผ่านสื่อดิจิทัลในภาคการเกษตร",[]],
 [6,"บทที่ 3 (ต่อ) การสร้างแบรนด์เพื่อเกษตรและชุมชน (1) และจริยธรรมสื่อกับการคุ้มครองทรัพย์สินทางปัญญา",[]],
@@ -197,6 +197,7 @@ var W=[
 [16,"บทที่ 8 การประเมินผลและแนวโน้มการสื่อสารนวัตกรรมเกษตรในอนาคต (2)",[]],
 [17,"สอบปลายภาค",[],"exam"]
 ];
+// ลิงก์เกม/เว็บ: ["ชื่อ","https://...","คำอธิบายสั้น","game"]
 // ไฟล์: ["ชื่อที่แสดง","ลิงก์ Google Drive หรือ pdf/w02-slide.pdf","ขนาดโดยประมาณ"] ใส่ในช่องที่ 3 ของแต่ละสัปดาห์
 // ตัวอย่าง: [2,"บทที่ 1 ... (ต่อ)",[["สไลด์บทที่ 1","pdf/w02-slide.pdf","3 MB"]]],
 // ---------------------------
@@ -207,6 +208,8 @@ var t=new Date();var cur=Math.floor((new Date(t.getFullYear(),t.getMonth(),t.get
 if(cur<1)cur=1;if(cur>W.length)cur=W.length;
 function el(tag,c,x){var e=document.createElement(tag);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function ext(f){return /^https:\/\//.test(f[1])}
+function kind(f){return f[3]||"pdf"}
+function openTxt(f){return kind(f)==="game"?"เปิดเกม":(/drive\.google\.com/.test(f[1])?"เปิดใน Drive":(ext(f)?"เปิดลิงก์":"เปิดดู"))}
 function link(cls,text,href){var a=el("a",cls,text);a.href=href;a.target="_blank";a.rel="noopener";return a}
 function dlBtn(f){if(ext(f))return document.createDocumentFragment();var a=el("a","pill ghost","ดาวน์โหลด");a.href=f[1];a.setAttribute("download",f[1].split("/").pop());return a}
 function hwBox(n){var h=HW[n];if(!h)return null;var c=el("div","hw");c.appendChild(el("b",null,h.name));
@@ -214,16 +217,16 @@ function hwBox(n){var h=HW[n];if(!h)return null;var c=el("div","hw");c.appendChi
  if(cur<n)c.appendChild(el("span","flag","เปิดส่ง สัปดาห์ที่ "+n));else c.appendChild(link("pill","ไปที่แบบฟอร์ม",h.url));return c}
 function filesBox(w){if(!w[2].length)return el("p","empty",w[3]==="exam"?"ไม่มีเอกสารประกอบ":"ยังไม่มีไฟล์ของสัปดาห์นี้");
  var box=el("div","files");
- w[2].forEach(function(f){var r=el("div","f");r.appendChild(el("span","pdf","PDF"));
+ w[2].forEach(function(f){var r=el("div","f");r.appendChild(el("span","pdf",kind(f)==="game"?"เกม":"PDF"));
   var n=el("span","fn",f[0]);if(f[2])n.appendChild(el("small",null,f[2]));r.appendChild(n);
-  r.appendChild(link("pill",ext(f)?"เปิดใน Drive":"เปิดดู",f[1]));r.appendChild(dlBtn(f));box.appendChild(r)});return box}
+  r.appendChild(link("pill",openTxt(f),f[1]));r.appendChild(dlBtn(f));box.appendChild(r)});return box}
 
 // การ์ดสัปดาห์นี้
 var cw=W[cur-1],nc=document.getElementById("nowCard");
 nc.appendChild(el("div","lbl","สัปดาห์ที่"));nc.appendChild(el("div","wkbig",String(cur)));
 nc.appendChild(el("h3",null,cw[1]));nc.appendChild(el("div","date",rng(cur)));
 var acts=el("div","acts");
-cw[2].forEach(function(f){acts.appendChild(link("pill",(ext(f)?"เปิดใน Drive: ":"เปิดดู: ")+f[0],f[1]));acts.appendChild(dlBtn(f))});
+cw[2].forEach(function(f){acts.appendChild(link("pill",openTxt(f)+": "+f[0],f[1]));acts.appendChild(dlBtn(f))});
 var hb=hwBox(cur);
 if(acts.childNodes.length)nc.appendChild(acts);
 else nc.appendChild(el("p","note",cw[3]==="exam"?"สัปดาห์สอบ ไม่มีเอกสารประกอบ":"ไฟล์ของสัปดาห์นี้ยังไม่เผยแพร่"));
